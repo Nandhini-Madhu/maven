@@ -17,7 +17,7 @@ public class test {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
 
-       driver.get("http://127.0.0.1:5500/pipeline/form.html");
+       driver.get("https://firstform-mauve.vercel.app");
     }
 
     @DataProvider(name = "formData")
