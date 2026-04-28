@@ -1,20 +1,18 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven'
-    }
-
     stages {
-        stage('Build') {
+        stage('Install Vercel') {
             steps {
-                bat 'mvn clean compile'
+                bat 'npm install -g vercel'
             }
         }
 
-        stage('Test') {
+        stage('Deploy') {
             steps {
-                bat 'mvn test'
+                withCredentials([string(credentialsId: 'vercel-token', variable: 'VERCEL_TOKEN')]) {
+                    bat 'vercel --prod --token=%VERCEL_TOKEN% --yes'
+                }
             }
         }
     }
