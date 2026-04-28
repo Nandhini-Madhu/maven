@@ -11,7 +11,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 withCredentials([string(credentialsId: 'vercel-token', variable: 'VERCEL_TOKEN')]) {
-                    bat 'vercel --prod --token=%VERCEL_TOKEN% --yes'
+                    bat '"C:\\Users\\Nandhini Madhu\\AppData\\Roaming\\npm\\vercel.cmd" --prod --token=%VERCEL_TOKEN% --yes'
                 }
             }
         }
