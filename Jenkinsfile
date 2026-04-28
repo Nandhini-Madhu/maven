@@ -29,7 +29,7 @@ pipeline {
             steps {
                 bat """
                     set PATH=%JAVA_HOME%\\bin;%MAVEN_HOME%\\bin;%PATH%
-                    mvn clean test -f selenium-test/pom.xml
+                    mvn clean test
                 """
             }
         }
