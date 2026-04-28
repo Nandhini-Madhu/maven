@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        MAVEN_HOME = 'C:\\Program Files\\Maven\\apache-maven-3.9.9'
+        MAVEN_HOME = 'C:\\Users\\Nandhini Madhu\\AppData\\Roaming\\Code\\User\\globalStorage\\pleiades.java-extension-pack-jdk\\maven\\latest'
         JAVA_HOME  = 'C:\\Program Files\\Java\\jdk-24'
     }
 
