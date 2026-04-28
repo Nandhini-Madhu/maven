@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        MAVEN_HOME = 'C:\\Program Files\\Maven\\apache-maven-3.9.9'
+        JAVA_HOME  = 'C:\\Program Files\\Java\\jdk-24'
+    }
+
     stages {
 
         stage('Install Vercel') {
@@ -22,7 +27,10 @@ pipeline {
 
         stage('Run Selenium Tests') {
             steps {
-                bat 'mvn clean test -f selenium-test/pom.xml'
+                bat """
+                    set PATH=%JAVA_HOME%\\bin;%MAVEN_HOME%\\bin;%PATH%
+                    mvn clean test -f selenium-test/pom.xml
+                """
             }
         }
 
