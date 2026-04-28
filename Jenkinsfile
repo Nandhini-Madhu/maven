@@ -9,7 +9,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Vercel') {
             steps {
                 withCredentials([string(credentialsId: 'vercel-token', variable: 'VERCEL_TOKEN')]) {
                     bat """
@@ -20,5 +20,20 @@ pipeline {
             }
         }
 
+        stage('Run Selenium Tests') {
+            steps {
+                bat 'mvn clean test -f selenium-test/pom.xml'
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed! Deployed and all tests passed.'
+        }
+        failure {
+            echo 'Pipeline failed! Check logs above.'
+        }
     }
 }
