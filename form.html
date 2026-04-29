@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -56,22 +56,33 @@
       display: block; font-size: 0.78rem; font-weight: 500; color: var(--muted);
       text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;
     }
+    label .optional {
+      text-transform: none; letter-spacing: 0; font-weight: 300;
+      color: #44445a; font-size: 0.72rem; margin-left: 0.3rem;
+    }
     .input-wrap { position: relative; }
     .input-wrap svg {
       position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
       width: 18px; height: 18px; color: var(--muted); pointer-events: none; transition: color 0.2s;
     }
-    input {
+    .input-wrap.textarea-wrap svg {
+      top: 14px; transform: none;
+    }
+    input, textarea {
       width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; background: #1e1e25;
       border: 1.5px solid var(--border); border-radius: 12px; color: var(--text);
       font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none;
       transition: border-color 0.25s, box-shadow 0.25s;
     }
-    input::placeholder { color: #3a3a48; }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(110,247,196,0.1); }
-    input:focus + svg, .input-wrap:focus-within svg { color: var(--accent); }
-    input.error { border-color: var(--error); box-shadow: 0 0 0 3px rgba(255,95,114,0.1); }
-    input.valid { border-color: var(--success); box-shadow: 0 0 0 3px rgba(110,247,196,0.08); }
+    textarea {
+      resize: vertical; min-height: 90px; line-height: 1.5;
+    }
+    input::placeholder, textarea::placeholder { color: #3a3a48; }
+    input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(110,247,196,0.1); }
+    input:focus ~ svg, textarea:focus ~ svg,
+    .input-wrap:focus-within svg { color: var(--accent); }
+    input.error, textarea.error { border-color: var(--error); box-shadow: 0 0 0 3px rgba(255,95,114,0.1); }
+    input.valid, textarea.valid { border-color: var(--success); box-shadow: 0 0 0 3px rgba(110,247,196,0.08); }
     .msg {
       font-size: 0.78rem; margin-top: 0.4rem; min-height: 1rem; padding-left: 0.2rem;
       display: flex; align-items: center; gap: 0.3rem; opacity: 0;
@@ -96,15 +107,12 @@
     .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(110,247,196,0.25); }
     .submit-btn:hover:not(:disabled)::after { opacity: 1; }
     .submit-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
-
-    /* ✅ Disabled state */
     .submit-btn:disabled {
       opacity: 0.35;
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
     }
-
     .success-banner {
       display: none; margin-top: 1.2rem; padding: 1rem 1.2rem;
       background: rgba(110,247,196,0.08); border: 1px solid rgba(110,247,196,0.25);
@@ -122,6 +130,7 @@
     <h1>Student<br/><span>Registration</span></h1>
     <p>Fill in the details below to register.</p>
   </div>
+
   <div class="field">
     <label for="name">Full Name</label>
     <div class="input-wrap">
@@ -130,6 +139,7 @@
     </div>
     <div class="msg" id="name-msg"></div>
   </div>
+
   <div class="field">
     <label for="phone">Phone Number</label>
     <div class="input-wrap">
@@ -138,6 +148,7 @@
     </div>
     <div class="msg" id="phone-msg"></div>
   </div>
+
   <div class="field">
     <label for="roll">Roll Number</label>
     <div class="input-wrap">
@@ -147,7 +158,15 @@
     <div class="msg" id="roll-msg"></div>
   </div>
 
-  <!-- ✅ id and disabled added -->
+  <div class="field">
+    <label for="address">Address <span class="optional">(optional)</span></label>
+    <div class="input-wrap textarea-wrap">
+      <textarea id="address" placeholder="e.g. 12, MG Road, Chennai, Tamil Nadu" autocomplete="off"></textarea>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    </div>
+    <div class="msg" id="address-msg"></div>
+  </div>
+
   <button id="registerBtn" class="submit-btn" onclick="submitForm()" disabled>Register Now →</button>
   <div class="success-banner" id="success-banner">✓ Registration successful! Welcome aboard.</div>
 </div>
@@ -156,13 +175,13 @@
   const rules = {
     name:  { validate: v => v.trim().length >= 3 && /^[a-zA-Z\s]+$/.test(v.trim()), errorMsg: '✕ Name must be at least 3 letters (alphabets only).', okMsg: '✓ Looks good!' },
     phone: { validate: v => /^[6-9]\d{9}$/.test(v.trim()), errorMsg: '✕ Enter a valid 10-digit Indian mobile number.', okMsg: '✓ Valid number!' },
-    roll:  { validate: v => /^[A-Za-z0-9]{4,15}$/.test(v.trim()), errorMsg: '✕ Roll number must be 4–15 alphanumeric characters.', okMsg: '✓ Roll number accepted!' }
+    roll:  { validate: v => /^[A-Za-z0-9]{4,15}$/.test(v.trim()), errorMsg: '✕ Roll number must be 4–15 alphanumeric characters.', okMsg: '✓ Roll number accepted!' },
+    address: { optional: true, validate: v => v.trim().length >= 5, errorMsg: '✕ Address seems too short.', okMsg: '✓ Address noted!' }
   };
 
-  // ✅ Enable/disable button
   function updateButton() {
-    const ok = ['name','phone','roll'].every(id => rules[id].validate(document.getElementById(id).value));
-    document.getElementById('registerBtn').disabled = !ok;
+    const requiredOk = ['name','phone','roll'].every(id => rules[id].validate(document.getElementById(id).value));
+    document.getElementById('registerBtn').disabled = !requiredOk;
   }
 
   ['name','phone','roll'].forEach(id => {
@@ -171,14 +190,27 @@
     input.addEventListener('blur',  () => { validate(id, true);  updateButton(); });
   });
 
+  const addressEl = document.getElementById('address');
+  addressEl.addEventListener('input', () => {
+    if (addressEl.value.trim().length > 0) validate('address', false);
+    else {
+      addressEl.classList.remove('valid','error');
+      const msg = document.getElementById('address-msg');
+      msg.classList.remove('show','ok','err'); msg.textContent = '';
+    }
+  });
+  addressEl.addEventListener('blur', () => {
+    if (addressEl.value.trim().length > 0) validate('address', true);
+  });
+
   function validate(id, strict) {
     const input = document.getElementById(id);
     const msgEl = document.getElementById(id + '-msg');
     const val   = input.value;
     const rule  = rules[id];
     if (!val.trim().length) {
-      setField(input, msgEl, strict ? '✕ This field is required.' : '', strict ? 'err' : '');
-      return false;
+      setField(input, msgEl, strict && !rule.optional ? '✕ This field is required.' : '', strict && !rule.optional ? 'err' : '');
+      return rule.optional ? true : false;
     }
     if (rule.validate(val)) { setField(input, msgEl, rule.okMsg, 'ok'); return true; }
     else                    { setField(input, msgEl, rule.errorMsg, 'err'); return false; }
@@ -194,10 +226,11 @@
 
   function submitForm() {
     if (['name','phone','roll'].map(id => validate(id, true)).every(Boolean)) {
+      if (addressEl.value.trim().length > 0) validate('address', true);
       const banner = document.getElementById('success-banner');
       banner.classList.add('show');
       setTimeout(() => {
-        ['name','phone','roll'].forEach(id => {
+        ['name','phone','roll','address'].forEach(id => {
           const el = document.getElementById(id);
           el.value = ''; el.classList.remove('valid','error');
           const msg = document.getElementById(id+'-msg');
