@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent any 
 
     environment {
         MAVEN_HOME = 'C:\\Users\\Nandhini Madhu\\AppData\\Roaming\\Code\\User\\globalStorage\\pleiades.java-extension-pack-jdk\\maven\\latest'
