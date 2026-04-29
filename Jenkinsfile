@@ -7,7 +7,7 @@ pipeline {
         RECIPIENT  = 'nandhinimadhu599@gmail.com'
     }
 
-    stages {
+    stages { 
 
         stage('Run Selenium Tests') {
             steps {
