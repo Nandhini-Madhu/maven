@@ -1,16 +1,36 @@
 pipeline {
-    agent any 
+
+    agent any
 
     environment {
+
         MAVEN_HOME = 'C:\\Users\\Nandhini Madhu\\AppData\\Roaming\\Code\\User\\globalStorage\\pleiades.java-extension-pack-jdk\\maven\\latest'
+
         JAVA_HOME  = 'C:\\Program Files\\Java\\jdk-24'
+
         RECIPIENT  = 'nandhinimadhu599@gmail.com'
+
+        EC2_IP     = '13.233.233.210'
+
+        IMAGE_NAME = 'frontend-app'
+
+        CONTAINER  = 'frontend-container'
     }
 
-    stages { 
+    stages {
+
+        stage('Clone Repository') {
+
+            steps {
+
+                git 'https://github.com/Nandhini-Madhu/pipeline.git'
+            }
+        }
 
         stage('Run Selenium Tests') {
+
             steps {
+
                 bat """
                     set PATH=%JAVA_HOME%\\bin;%MAVEN_HOME%\\bin;%PATH%
                     mvn clean test
@@ -19,75 +39,91 @@ pipeline {
         }
 
         stage('Send Approval Mail') {
+
             steps {
+
                 emailext(
+
                     to: "${RECIPIENT}",
+
                     subject: "Approval Required - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+
                     mimeType: 'text/html',
+
                     body: """
+
                         <div style="border:1px solid #ccc; padding:15px; width:420px;">
 
-                            <h3>Deployment Approval</h3>
+                            <h2>Deployment Approval</h2>
 
-                            <p>Build: ${env.BUILD_NUMBER}</p>
-                            <p>Status: Tests Completed</p>
+                            <p><b>Build:</b> ${env.BUILD_NUMBER}</p>
+
+                            <p><b>Status:</b> Selenium Tests Passed</p>
+
+                            <p>
+                                Jenkins Build:
+                                <a href="${env.BUILD_URL}">
+                                    Open Build
+                                </a>
+                            </p>
 
                             <p>
                                 Report:
-                                <a href="${env.BUILD_URL}Extent_Report/">View Report</a>
+                                <a href="${env.BUILD_URL}Extent_Report/">
+                                    View Extent Report
+                                </a>
                             </p>
 
                             <hr/>
 
-                            <p><b>Choose an action:</b></p>
-
                             <p>
-                                <a href="${env.BUILD_URL}" 
-                                   style="padding:8px 15px; border:1px solid green; text-decoration:none;">
-                                   Approve
-                                </a>
-
-                                &nbsp;&nbsp;
-
-                                <a href="${env.BUILD_URL}" 
-                                   style="padding:8px 15px; border:1px solid red; text-decoration:none;">
-                                   Abort
-                                </a>
+                                Open Jenkins and click:
                             </p>
 
-                            <p style="margin-top:15px;">
-                                Open Jenkins and click <b>Proceed</b> or <b>Abort</b>.
-                            </p>
+                            <ul>
+                                <li>Proceed → Deploy to AWS EC2</li>
+                                <li>Abort → Stop Deployment</li>
+                            </ul>
 
                         </div>
                     """,
+
                     attachmentsPattern: 'reports/extent-report.html',
+
                     attachLog: true
                 )
             }
         }
 
         stage('Approval') {
+
             steps {
+
                 timeout(time: 24, unit: 'HOURS') {
-                    input message: 'Approve deployment?',
-                          ok: 'Deploy Now'
+
+                    input(
+                        message: 'Approve Deployment To AWS EC2?',
+                        ok: 'Deploy Now'
+                    )
                 }
             }
         }
 
-        stage('Install Vercel') {
-            steps {
-                bat 'npm install -g vercel'
-            }
-        }
+        stage('Deploy To AWS EC2') {
 
-        stage('Deploy to Vercel') {
             steps {
-                withCredentials([string(credentialsId: 'vercel-token', variable: 'VERCEL_TOKEN')]) {
+
+                sshagent(credentials: ['ec2-key']) {
+
                     bat """
-                        set PATH=%APPDATA%\\npm;%PATH%
-                        vercel --prod --token=%VERCEL_TOKEN% --yes --global-config="%WORKSPACE%\\.vercel-config"
+
+                    scp -o StrictHostKeyChecking=no Dockerfile form.html ec2-user@%EC2_IP%:/home/ec2-user/
+
+                    ssh -o StrictHostKeyChecking=no ec2-user@%EC2_IP% ^
+                    "sudo docker stop %CONTAINER% || true && ^
+                     sudo docker rm %CONTAINER% || true && ^
+                     sudo docker build -t %IMAGE_NAME% /home/ec2-user && ^
+                     sudo docker run -d -p 80:80 --name %CONTAINER% %IMAGE_NAME%"
                     """
                 }
             }
@@ -97,36 +133,81 @@ pipeline {
     post {
 
         always {
+
             publishHTML([
+
                 reportDir: 'reports',
+
                 reportFiles: 'extent-report.html',
+
                 reportName: 'Extent Report',
+
                 keepAll: true,
+
                 alwaysLinkToLastBuild: true,
+
                 allowMissing: false
             ])
         }
 
         success {
+
             emailext(
+
                 subject: "Deployment Successful - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Deployment completed successfully.\n\nReport: ${env.BUILD_URL}Extent_Report/",
+
+                body: """
+
+Deployment completed successfully.
+
+Frontend deployed on AWS EC2 successfully.
+
+Application URL:
+http://${EC2_IP}
+
+Jenkins Build:
+${env.BUILD_URL}
+
+Extent Report:
+${env.BUILD_URL}Extent_Report/
+
+""",
+
                 to: "${RECIPIENT}"
             )
         }
 
         failure {
+
             emailext(
+
                 subject: "Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build failed.\nCheck: ${env.BUILD_URL}",
+
+                body: """
+
+Pipeline failed.
+
+Check Jenkins:
+${env.BUILD_URL}
+
+""",
+
                 to: "${RECIPIENT}"
             )
         }
 
         aborted {
+
             emailext(
+
                 subject: "Deployment Aborted - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Deployment was aborted.",
+
+                body: """
+
+Deployment was aborted manually.
+
+""",
+
                 to: "${RECIPIENT}"
             )
         }
