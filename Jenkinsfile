@@ -11,12 +11,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Nandhini-Madhu/pipeline.git'
-            }
-        }
-
         stage('Run Selenium Tests') {
             steps {
                 sh 'mvn clean test'
@@ -93,48 +87,53 @@ pipeline {
                 reportName: 'Extent Report',
                 keepAll: true,
                 alwaysLinkToLastBuild: true,
-                allowMissing: false
+                allowMissing: true
             ])
         }
 
         success {
             emailext(
                 subject: "Deployment Successful - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                mimeType: 'text/html',
                 body: """
-Deployment completed successfully.
-Frontend deployed on AWS EC2 successfully.
-
-Application URL:
-http://${EC2_IP}
-
-Jenkins Build:
-${env.BUILD_URL}
-
-Extent Report:
-${env.BUILD_URL}Extent_Report/
-""",
+                    <div style="border:1px solid #ccc; padding:15px; width:420px;">
+                        <h2>✅ Deployment Successful</h2>
+                        <p>Frontend deployed on AWS EC2 successfully.</p>
+                        <p><b>Application URL:</b> <a href="http://${EC2_IP}">http://${EC2_IP}</a></p>
+                        <p><b>Jenkins Build:</b> <a href="${env.BUILD_URL}">Open Build</a></p>
+                        <p><b>Extent Report:</b> <a href="${env.BUILD_URL}Extent_Report/">View Report</a></p>
+                    </div>
+                """,
                 to: "${RECIPIENT}"
             )
         }
 
         failure {
             emailext(
-                subject: "Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                subject: "❌ Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                mimeType: 'text/html',
                 body: """
-Pipeline failed.
-Check Jenkins:
-${env.BUILD_URL}
-""",
+                    <div style="border:1px solid #ccc; padding:15px; width:420px;">
+                        <h2>❌ Pipeline Failed</h2>
+                        <p>Check Jenkins for details.</p>
+                        <p><b>Jenkins Build:</b> <a href="${env.BUILD_URL}">Open Build</a></p>
+                    </div>
+                """,
                 to: "${RECIPIENT}"
             )
         }
 
         aborted {
             emailext(
-                subject: "Deployment Aborted - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                subject: "⚠️ Deployment Aborted - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                mimeType: 'text/html',
                 body: """
-Deployment was aborted manually.
-""",
+                    <div style="border:1px solid #ccc; padding:15px; width:420px;">
+                        <h2>⚠️ Deployment Aborted</h2>
+                        <p>Deployment was aborted manually.</p>
+                        <p><b>Jenkins Build:</b> <a href="${env.BUILD_URL}">Open Build</a></p>
+                    </div>
+                """,
                 to: "${RECIPIENT}"
             )
         }
