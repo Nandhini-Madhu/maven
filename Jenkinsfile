@@ -16,17 +16,6 @@ pipeline {
             }
         }
 
-        stage('Approval') {
-            steps {
-                timeout(time: 24, unit: 'HOURS') {
-                    input(
-                        message: 'Approve Deployment To AWS EC2?',
-                        ok: 'Deploy Now'
-                    )
-                }
-            }
-        }
-
         stage('Deploy To AWS EC2') {
             steps {
                 sshagent(credentials: ['ec2-key']) {
