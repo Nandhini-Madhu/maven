@@ -33,17 +33,21 @@
             <artifactId>extentreports</artifactId>
             <version>5.1.1</version>
         </dependency>
+        <!-- WebDriverManager — auto manages ChromeDriver -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.8.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Single merged surefire plugin declaration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <!-- test.xml drives which tests run; no need for <includes> -->
                     <suiteXmlFiles>
                         <suiteXmlFile>test.xml</suiteXmlFile>
                     </suiteXmlFiles>
