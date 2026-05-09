@@ -1,10 +1,12 @@
 package com.test;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
@@ -13,14 +15,21 @@ import java.time.Duration;
 
 @Listeners(stop.class)
 public class test {
-
     WebDriver driver;
     WebDriverWait wait;
 
     @BeforeMethod
     public void setup() {
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--disable-gpu");
+
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver(options);
+
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         driver.get("https://maven-navy.vercel.app/");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("name")));
@@ -61,7 +70,6 @@ public class test {
         WebElement button = wait.until(
             ExpectedConditions.presenceOfElementLocated(By.id("registerBtn"))
         );
-
         boolean actualState = button.isEnabled();
         System.out.println("Expected: " + expectedState + " | Actual: " + actualState);
         Assert.assertEquals(actualState, expectedState, "Button state mismatch");
@@ -69,6 +77,8 @@ public class test {
 
     @AfterMethod
     public void teardown() {
-        driver.quit();
+        if (driver != null) {
+            driver.quit();
+        }
     }
 }
