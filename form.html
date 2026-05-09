@@ -29,9 +29,25 @@
       background: radial-gradient(circle, rgba(247,162,110,0.05) 0%, transparent 70%);
       pointer-events: none;
     }
+
+    /* ── Progress Bar ── */
+    .progress-wrap { margin-bottom: 1.8rem; }
+    .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem;
+    }
+    .progress-track {
+      height: 4px; background: var(--border); border-radius: 99px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 99px; transition: width 0.4s ease;
+    }
+
     .card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 24px; padding: 3rem; width: 100%; max-width: 520px;
+      border-radius: 24px; padding: 3rem; width: 100%; max-width: 560px;
       position: relative; animation: slideUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
     }
     @keyframes slideUp {
@@ -44,7 +60,20 @@
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       border-radius: 0 0 4px 4px;
     }
-    .header { margin-bottom: 2rem; }
+
+    /* ── Stats badges ── */
+    .stats-row {
+      display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .stat-badge {
+      background: #1e1e25; border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.5rem 0.9rem;
+      font-size: 0.75rem; color: var(--muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .stat-badge span { color: var(--accent); font-weight: 600; }
+
+    .header { margin-bottom: 1.5rem; }
     .header h1 {
       font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
       color: var(--text); letter-spacing: -0.03em; line-height: 1.1;
@@ -52,7 +81,6 @@
     .header h1 span { color: var(--accent); }
     .header p { margin-top: 0.5rem; color: var(--muted); font-size: 0.9rem; font-weight: 300; }
 
-    /* Section divider */
     .section-title {
       font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
       text-transform: uppercase; color: var(--accent2);
@@ -73,13 +101,28 @@
       text-transform: none; letter-spacing: 0; font-weight: 300;
       color: #44445a; font-size: 0.72rem; margin-left: 0.3rem;
     }
+    label .required-star { color: var(--error); margin-left: 2px; }
+
     .input-wrap { position: relative; }
-    .input-wrap svg {
+    .input-wrap svg.field-icon {
       position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
       width: 16px; height: 16px; color: var(--muted); pointer-events: none; transition: color 0.2s;
     }
-    .input-wrap.textarea-wrap svg { top: 14px; transform: none; }
-    .input-wrap.select-wrap svg { pointer-events: none; }
+    .input-wrap.textarea-wrap svg.field-icon { top: 14px; transform: none; }
+
+    /* character counter */
+    .char-counter {
+      position: absolute; right: 12px; bottom: 10px;
+      font-size: 0.7rem; color: var(--muted); pointer-events: none;
+    }
+
+    /* password toggle */
+    .toggle-pw {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted);
+      padding: 0; display: flex; align-items: center;
+    }
+    .toggle-pw:hover { color: var(--accent); }
 
     input, textarea, select {
       width: 100%; padding: 0.85rem 1rem 0.85rem 2.6rem; background: #1e1e25;
@@ -89,12 +132,12 @@
     }
     select { appearance: none; cursor: pointer; }
     select option { background: #1e1e25; color: var(--text); }
-    textarea { resize: vertical; min-height: 85px; line-height: 1.5; }
+    textarea { resize: vertical; min-height: 85px; line-height: 1.5; padding-right: 3rem; }
     input::placeholder, textarea::placeholder { color: #3a3a48; }
     input:focus, textarea:focus, select:focus {
       border-color: var(--accent); box-shadow: 0 0 0 3px rgba(110,247,196,0.1);
     }
-    .input-wrap:focus-within svg { color: var(--accent); }
+    .input-wrap:focus-within svg.field-icon { color: var(--accent); }
     input.error, textarea.error, select.error {
       border-color: var(--error); box-shadow: 0 0 0 3px rgba(255,95,114,0.1);
     }
@@ -102,7 +145,6 @@
       border-color: var(--success); box-shadow: 0 0 0 3px rgba(110,247,196,0.08);
     }
 
-    /* Row layout for 2 fields side by side */
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
 
@@ -115,6 +157,38 @@
     .msg.err  { color: var(--error); }
     .msg.ok   { color: var(--success); }
 
+    /* ── Strength meter ── */
+    .strength-wrap { margin-top: 0.4rem; display: none; }
+    .strength-wrap.show { display: block; }
+    .strength-bars { display: flex; gap: 4px; margin-bottom: 0.3rem; }
+    .strength-bar {
+      flex: 1; height: 3px; border-radius: 99px;
+      background: var(--border); transition: background 0.3s;
+    }
+    .strength-bar.weak   { background: var(--error); }
+    .strength-bar.medium { background: var(--accent2); }
+    .strength-bar.strong { background: var(--accent); }
+    .strength-label { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── Tooltip ── */
+    .tooltip-wrap { position: relative; display: inline-block; margin-left: 0.4rem; }
+    .tooltip-icon {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--border); color: var(--muted);
+      font-size: 0.65rem; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: help; vertical-align: middle;
+    }
+    .tooltip-box {
+      display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+      background: #2a2a38; border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.5rem 0.75rem;
+      font-size: 0.72rem; color: var(--text); white-space: nowrap;
+      z-index: 10; pointer-events: none;
+    }
+    .tooltip-wrap:hover .tooltip-box { display: block; }
+
+    /* ── Submit button ── */
     .submit-btn {
       margin-top: 2rem; width: 100%; padding: 1rem;
       background: linear-gradient(135deg, var(--accent), #4ad9a8);
@@ -133,6 +207,15 @@
     .submit-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
     .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
 
+    /* loading spinner inside button */
+    .btn-spinner {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid rgba(10,26,20,0.3); border-top-color: #0a1a14;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .success-banner {
       display: none; margin-top: 1.2rem; padding: 1rem 1.2rem;
       background: rgba(110,247,196,0.08); border: 1px solid rgba(110,247,196,0.25);
@@ -141,24 +224,60 @@
     }
     .success-banner.show { display: block; }
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    /* ── Dark/Light toggle ── */
+    .theme-toggle {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: #1e1e25; border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.4rem 0.6rem;
+      cursor: pointer; color: var(--muted); font-size: 0.8rem;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* Light mode */
+    body.light {
+      --bg: #f4f4f8; --surface: #ffffff; --border: #dde0e8;
+      --text: #1a1a2e; --muted: #7a7a8c;
+    }
+    body.light input, body.light textarea, body.light select { background: #f9f9fb; }
+    body.light .stat-badge { background: #f0f0f5; }
   </style>
 </head>
 <body>
 <div class="card">
   <div class="card-accent"></div>
+
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+
   <div class="header">
     <h1>Student<br/><span>Registration</span></h1>
-    <p>Fields marked as required must be filled. Others are optional.</p>
+    <p>Required fields are marked with <span style="color:var(--error)">★</span>. Others are optional.</p>
+  </div>
+
+  <!-- Stats badges -->
+  <div class="stats-row">
+    <div class="stat-badge">Fields filled: <span id="stat-filled">0</span>/3</div>
+    <div class="stat-badge">Required left: <span id="stat-left">3</span></div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Form completion</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
 
   <!-- ── PERSONAL INFO ── -->
   <div class="section-title">Personal Info</div>
 
   <div class="field">
-    <label for="name">Full Name</label>
+    <label for="name">Full Name <span class="required-star">★</span></label>
     <div class="input-wrap">
-      <input type="text" id="name" placeholder="e.g. Arjun Kumar" autocomplete="off"/>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <input type="text" id="name" placeholder="e.g. Arjun Kumar" autocomplete="off" maxlength="50"/>
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </div>
     <div class="msg" id="name-msg"></div>
   </div>
@@ -168,32 +287,35 @@
       <label for="dob">Date of Birth <span class="optional">(optional)</span></label>
       <div class="input-wrap">
         <input type="date" id="dob"/>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </div>
       <div class="msg" id="dob-msg"></div>
     </div>
-
     <div class="field">
       <label for="gender">Gender <span class="optional">(optional)</span></label>
-      <div class="input-wrap select-wrap">
+      <div class="input-wrap">
         <select id="gender">
           <option value="">Select</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Other</option>
-          <option>Prefer not to say</option>
+          <option>Male</option><option>Female</option>
+          <option>Other</option><option>Prefer not to say</option>
         </select>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="msg" id="gender-msg"></div>
     </div>
   </div>
 
   <div class="field">
-    <label for="phone">Phone Number</label>
+    <label for="phone">
+      Phone Number <span class="required-star">★</span>
+      <span class="tooltip-wrap">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-box">10-digit Indian mobile number starting with 6-9</span>
+      </span>
+    </label>
     <div class="input-wrap">
       <input type="tel" id="phone" placeholder="e.g. 9876543210" maxlength="10" autocomplete="off"/>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.71 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.91.35 1.85.58 2.81.71A2 2 0 0 1 22 16.92z"/></svg>
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.71 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.91.35 1.85.58 2.81.71A2 2 0 0 1 22 16.92z"/></svg>
     </div>
     <div class="msg" id="phone-msg"></div>
   </div>
@@ -202,7 +324,7 @@
     <label for="email">Email Address <span class="optional">(optional)</span></label>
     <div class="input-wrap">
       <input type="email" id="email" placeholder="e.g. arjun@example.com" autocomplete="off"/>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
     </div>
     <div class="msg" id="email-msg"></div>
   </div>
@@ -211,10 +333,16 @@
   <div class="section-title">Academic Info</div>
 
   <div class="field">
-    <label for="roll">Roll Number</label>
+    <label for="roll">
+      Roll Number <span class="required-star">★</span>
+      <span class="tooltip-wrap">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-box">4–15 alphanumeric characters e.g. CS2024001</span>
+      </span>
+    </label>
     <div class="input-wrap">
-      <input type="text" id="roll" placeholder="e.g. CS2024001" autocomplete="off"/>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6M7 16h4"/></svg>
+      <input type="text" id="roll" placeholder="e.g. CS2024001" autocomplete="off" maxlength="15"/>
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6M7 16h4"/></svg>
     </div>
     <div class="msg" id="roll-msg"></div>
   </div>
@@ -222,7 +350,7 @@
   <div class="row">
     <div class="field">
       <label for="department">Department <span class="optional">(optional)</span></label>
-      <div class="input-wrap select-wrap">
+      <div class="input-wrap">
         <select id="department">
           <option value="">Select</option>
           <option>Computer Science</option>
@@ -232,22 +360,19 @@
           <option>Civil Engg.</option>
           <option>Business Admin.</option>
         </select>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="msg" id="department-msg"></div>
     </div>
-
     <div class="field">
       <label for="year">Year of Study <span class="optional">(optional)</span></label>
-      <div class="input-wrap select-wrap">
+      <div class="input-wrap">
         <select id="year">
           <option value="">Select</option>
-          <option>1st Year</option>
-          <option>2nd Year</option>
-          <option>3rd Year</option>
-          <option>4th Year</option>
+          <option>1st Year</option><option>2nd Year</option>
+          <option>3rd Year</option><option>4th Year</option>
         </select>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
       <div class="msg" id="year-msg"></div>
     </div>
@@ -259,7 +384,7 @@
   <div class="row">
     <div class="field">
       <label for="blood">Blood Group <span class="optional">(optional)</span></label>
-      <div class="input-wrap select-wrap">
+      <div class="input-wrap">
         <select id="blood">
           <option value="">Select</option>
           <option>A+</option><option>A−</option>
@@ -267,16 +392,15 @@
           <option>O+</option><option>O−</option>
           <option>AB+</option><option>AB−</option>
         </select>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 8 2 13a10 10 0 0 0 20 0c0-5-4.48-11-10-11z"/></svg>
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 8 2 13a10 10 0 0 0 20 0c0-5-4.48-11-10-11z"/></svg>
       </div>
       <div class="msg" id="blood-msg"></div>
     </div>
-
     <div class="field">
       <label for="nationality">Nationality <span class="optional">(optional)</span></label>
       <div class="input-wrap">
         <input type="text" id="nationality" placeholder="e.g. Indian" autocomplete="off"/>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       </div>
       <div class="msg" id="nationality-msg"></div>
     </div>
@@ -286,7 +410,7 @@
     <label for="parent">Parent / Guardian Name <span class="optional">(optional)</span></label>
     <div class="input-wrap">
       <input type="text" id="parent" placeholder="e.g. Rajesh Kumar" autocomplete="off"/>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     </div>
     <div class="msg" id="parent-msg"></div>
   </div>
@@ -294,13 +418,17 @@
   <div class="field">
     <label for="address">Address <span class="optional">(optional)</span></label>
     <div class="input-wrap textarea-wrap">
-      <textarea id="address" placeholder="e.g. 12, MG Road, Chennai, Tamil Nadu" autocomplete="off"></textarea>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <textarea id="address" placeholder="e.g. 12, MG Road, Chennai, Tamil Nadu" autocomplete="off" maxlength="200"></textarea>
+      <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="char-counter" id="address-counter">0/200</span>
     </div>
     <div class="msg" id="address-msg"></div>
   </div>
 
-  <button id="registerBtn" class="submit-btn" onclick="submitForm()" disabled>Register Now →</button>
+  <button id="registerBtn" class="submit-btn" onclick="submitForm()" disabled>
+    <span id="btn-text">Register Now →</span>
+    <div class="btn-spinner" id="btn-spinner"></div>
+  </button>
   <div class="success-banner" id="success-banner">✓ Registration successful! Welcome aboard.</div>
 </div>
 
@@ -326,7 +454,28 @@
   function updateButton() {
     const ok = requiredIds.every(id => rules[id].validate(document.getElementById(id).value));
     document.getElementById('registerBtn').disabled = !ok;
+    updateStats();
+    updateProgress();
   }
+
+  function updateStats() {
+    const filled = requiredIds.filter(id => rules[id].validate(document.getElementById(id).value)).length;
+    const left = requiredIds.length - filled;
+    document.getElementById('stat-filled').textContent = filled;
+    document.getElementById('stat-left').textContent = left;
+  }
+
+  function updateProgress() {
+    const filled = requiredIds.filter(id => rules[id].validate(document.getElementById(id).value)).length;
+    const pct = Math.round((filled / requiredIds.length) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+  }
+
+  // Character counter for address
+  document.getElementById('address').addEventListener('input', function() {
+    document.getElementById('address-counter').textContent = this.value.length + '/200';
+  });
 
   allIds.forEach(id => {
     const el = document.getElementById(id);
@@ -340,7 +489,7 @@
     const input = document.getElementById(id);
     const msgEl = document.getElementById(id + '-msg');
     if (!input || !msgEl) return true;
-    const val  = (input.tagName === 'SELECT') ? input.value : input.value;
+    const val  = input.value;
     const rule = rules[id];
     const empty = !val.trim().length && !(input.tagName === 'SELECT' && val);
 
@@ -365,10 +514,20 @@
 
   function submitForm() {
     const reqOk = requiredIds.map(id => validate(id, true)).every(Boolean);
-    if (reqOk) {
+    if (!reqOk) return;
+
+    // Loading state
+    document.getElementById('btn-text').style.display = 'none';
+    document.getElementById('btn-spinner').style.display = 'block';
+    document.getElementById('registerBtn').disabled = true;
+
+    setTimeout(() => {
+      document.getElementById('btn-text').style.display = 'block';
+      document.getElementById('btn-spinner').style.display = 'none';
+
       allIds.forEach(id => validate(id, false));
-      const banner = document.getElementById('success-banner');
-      banner.classList.add('show');
+      document.getElementById('success-banner').classList.add('show');
+
       setTimeout(() => {
         allIds.forEach(id => {
           const el = document.getElementById(id);
@@ -379,11 +538,21 @@
           const msg = document.getElementById(id + '-msg');
           if (msg) { msg.classList.remove('show','ok','err'); msg.textContent = ''; }
         });
-        banner.classList.remove('show');
+        document.getElementById('address-counter').textContent = '0/200';
+        document.getElementById('success-banner').classList.remove('show');
         updateButton();
       }, 3000);
-    }
+    }, 1200);
   }
+
+  function toggleTheme() {
+    document.body.classList.toggle('light');
+    document.querySelector('.theme-toggle').textContent =
+      document.body.classList.contains('light') ? '🌙' : '☀️';
+  }
+
+  updateStats();
+  updateProgress();
 </script>
 </body>
 </html>
