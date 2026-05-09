@@ -18,7 +18,7 @@ pipeline {
 
         stage('Deploy To AWS EC2') {
             steps {
-                sshagent(credentials: ['ec2-key']) {
+                sshagent(credentials: ['ec2_key']) {
                     sh """
                         scp -o StrictHostKeyChecking=no Dockerfile form.html ec2-user@${EC2_IP}:/home/ec2-user/
                         ssh -o StrictHostKeyChecking=no ec2-user@${EC2_IP} '
